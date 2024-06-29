@@ -126,4 +126,27 @@ class InMemoryTaskManagerTest {
         assertTrue(isEmptySubTasksList, "Суб таски удалились неправильно");
 
     }
+
+    @Test
+    void SubtaskIDMustBeDeletedCorrectlyFromTheEpic() {
+        taskManager.removeSubTaskById(subtask.getId());
+        List<Integer> subTaskIdList = epic.getSubTaskIdList();
+
+        assertEquals(0, subTaskIdList.size(), "ID неактуальных Субтасок хранится внутри Эпика");
+    }
+
+    @Test
+    void setMethodsCanChangeAnyField() {
+        int taskId = task.getId();
+        String taskDescription = task.getDescription();
+        String taskName = task.getName();
+
+        task.setId(taskId + 1);
+        task.setDescription(taskDescription + " Change");
+        task.setName(taskName + " Change");
+
+        assertNotEquals(taskId, task.getId(), "ID через сеттер не изменилось");
+        assertNotEquals(taskDescription, task.getDescription(), "Description через сеттер не изменилось");
+        assertNotEquals(taskName, task.getName(), "Name через сеттер не изменилось" );
+    }
 }
