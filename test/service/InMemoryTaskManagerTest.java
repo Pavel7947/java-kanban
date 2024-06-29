@@ -147,6 +147,6 @@ class InMemoryTaskManagerTest {
 
         assertNotEquals(taskId, task.getId(), "ID через сеттер не изменилось");
         assertNotEquals(taskDescription, task.getDescription(), "Description через сеттер не изменилось");
-        assertNotEquals(taskName, task.getName(), "Name через сеттер не изменилось" );
+        assertNotEquals(taskName, task.getName(), "Name через сеттер не изменилось");
     }
 }

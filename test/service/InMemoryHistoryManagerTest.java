@@ -10,13 +10,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
-    private  TaskManager taskManager;
-    private  Task task1;
-    private  Task task2;
-    private  Task task3;
+    private TaskManager taskManager;
+    private Task task1;
+    private Task task2;
+    private Task task3;
 
     @BeforeEach
-     void addTaskManagerAndTasks() {
+    void addTaskManagerAndTasks() {
         taskManager = new InMemoryTaskManager();
         task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         task2 = new Task("Test addNewTask2", "Test addNewTask2 description", Status.NEW);
