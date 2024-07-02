@@ -73,4 +73,12 @@ class InMemoryHistoryManagerTest {
 
         assertEquals(task3, historyTasks.get(1), "Задача из середины истории удалилась неправильно");
     }
+
+    @Test
+    void allTasksShouldBeDeleted() {
+        taskManager.removeAllTasks();
+        List<Task> historyTasks = taskManager.getHistory();
+
+        assertEquals(0, historyTasks.size());
+    }
 }
