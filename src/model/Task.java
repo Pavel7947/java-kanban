@@ -53,7 +53,7 @@ public class Task {
     }
 
     public Integer getEpicId() {
-        return null;
+        return -1;
     }
 
     @Override
