@@ -16,7 +16,7 @@ public class CSVFormatter {
                 String.valueOf(task.getStatus()), task.getDescription(), String.valueOf(task.getEpicId()));
     }
 
-    public static Task fromStringSCV(String line) {
+    public static Task fromStringCSV(String line) {
         String[] fields = line.split(",");
         TaskType taskType = TaskType.valueOf(fields[1]);
 

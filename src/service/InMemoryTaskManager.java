@@ -9,9 +9,9 @@ import java.util.Map;
 
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks;
-    private final Map<Integer, Subtask> subTasks;
-    private final Map<Integer, Epic> epics;
+    protected final Map<Integer, Task> tasks;
+    protected final Map<Integer, Subtask> subTasks;
+    protected final Map<Integer, Epic> epics;
     private int currentId;
     private final HistoryManager historyManager;
 

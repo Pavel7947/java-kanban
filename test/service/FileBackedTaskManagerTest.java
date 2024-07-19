@@ -1,7 +1,6 @@
 package service;
 
 import model.Epic;
-import model.Status;
 import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,21 +13,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest {
-    private FileBackedTaskManager taskManager;
-    private Task task;
-    private Epic epic;
-    private Subtask subtask;
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private Path path;
 
+    @Override
     @BeforeEach
-    void addTaskManagerAndTasks() {
+    void createTaskManagerAndFillingOutTheTask() {
         try {
             path = File.createTempFile("Test", ".csv").toPath();
             taskManager = Manager.getFileBackedTaskManager(path);
-            task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
-            epic = new Epic("Test addNewEpic", "Test addNewEpic description");
-            subtask = new Subtask("Test addNewSubTask", "Test addNewSubTask description", Status.NEW, epic.getId());
+            fillingTaskManager();
         } catch (IOException e) {
             throw new ManagerSaveException("Error creating a task manager", e);
         }
@@ -36,16 +30,19 @@ class FileBackedTaskManagerTest {
 
     @Test
     void anEmptyFileShouldBeReadCorrectly() {
-        assertTrue(taskManager.getListAllTasks().isEmpty(), "Загрузка из пустого файла неправильная");
-        assertTrue(taskManager.getListAllEpics().isEmpty(), "Загрузка из пустого файла неправильная");
-        assertTrue(taskManager.getListAllSubTasks().isEmpty(), "Загрузка из пустого файла неправильная");
+        try {
+            Path newPath = File.createTempFile("Test", ".csv").toPath();
+            FileBackedTaskManager newTaskManager = Manager.getFileBackedTaskManager(newPath);
+            assertTrue(newTaskManager.getListAllTasks().isEmpty(), "Загрузка из пустого файла неправильная");
+            assertTrue(newTaskManager.getListAllEpics().isEmpty(), "Загрузка из пустого файла неправильная");
+            assertTrue(newTaskManager.getListAllSubTasks().isEmpty(), "Загрузка из пустого файла неправильная");
+        } catch (IOException e) {
+            throw new ManagerSaveException("Error creating a task manager", e);
+        }
     }
 
     @Test
     void theTasksShouldBeSavedToTheFileCorrectly() {
-        taskManager.addTask(task);
-        taskManager.addEpic(epic);
-        taskManager.addSubTask(subtask);
         List<Task> savedTasks = taskManager.getListAllTasks();
         List<Epic> savedEpics = taskManager.getListAllEpics();
         List<Subtask> savedSubtask = taskManager.getListAllSubTasks();
