@@ -14,7 +14,6 @@ public class Main {
         taskManager.addTask(task1);
         Task task2 = new Task("Сдать финальный проект 6", "Нужно успеть к субботе", Status.NEW);
         taskManager.addTask(task2);
-
         Epic epic1 = new Epic("Закончить 1 модуль", "Главное все хорошо усвоить");
         taskManager.addEpic(epic1);
 

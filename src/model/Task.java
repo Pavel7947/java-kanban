@@ -52,6 +52,10 @@ public class Task {
         return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
     }
 
+    public Integer getEpicId() {
+        return -1;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(name, description, id, status);
