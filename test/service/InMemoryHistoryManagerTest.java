@@ -81,4 +81,19 @@ class InMemoryHistoryManagerTest {
 
         assertEquals(0, historyTasks.size());
     }
+
+    @Test
+    void thereShouldBeNoDuplication() {
+        taskManager.getTaskById(task1.getId());
+        List<Task> historyTasks = taskManager.getHistory();
+
+        assertEquals(3, historyTasks.size());
+    }
+
+    @Test
+    void anEmptyStoryShouldComeBack() {
+        taskManager = Manager.getDefault();
+
+        assertEquals(0, taskManager.getHistory().size());
+    }
 }

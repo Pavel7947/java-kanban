@@ -140,6 +140,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
             taskManager.setCurrentId(maxId + 1);
+            loadSetPriority(taskManager);
             return taskManager;
 
         } catch (IOException e) {
@@ -147,4 +148,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    private static void loadSetPriority(FileBackedTaskManager taskManager) {
+        List<Task> tasks = taskManager.getListAllTasks();
+        tasks.addAll(taskManager.getListAllSubTasks());
+        taskManager.setByPriority.addAll(tasks.stream().filter(task -> !task.getEndTime().
+                equals(Task.DEFAULT_TIME)).toList());
+
+    }
 }
+

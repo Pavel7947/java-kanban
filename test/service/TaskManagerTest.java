@@ -7,6 +7,8 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +21,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     protected Subtask subtask;
 
     protected void fillingTaskManager() {
-        task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
+        task = new Task("Test addNewTask", "Test addNewTask description",
+                Status.NEW, LocalDateTime.now(), Duration.ofMinutes(450));
         taskManager.addTask(task);
         epic = new Epic("Test addNewEpic", "Test addNewEpic description");
         taskManager.addEpic(epic);
-        subtask = new Subtask("Test addNewSubTask", "Test addNewSubTask description", Status.NEW, epic.getId());
+        subtask = new Subtask("Test addNewSubTask", "Test addNewSubTask description",
+                Status.NEW, epic.getId(), LocalDateTime.now().minusDays(1), Duration.ofMinutes(450));
         taskManager.addSubTask(subtask);
     }
 
@@ -154,4 +158,54 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNull(deletedEpic, "Эпик не удалился по ID");
         assertNull(deletedSubtask, "Субтаска после удаления эпика по ID не удалилась");
     }
+
+    @Test
+    void theEpicStatusShouldBeCalculatedCorrectly() {
+        Subtask subtask1 = new Subtask("Test addNewSubTask1", "Test addNewSubTask1 description",
+                Status.NEW, epic.getId(), LocalDateTime.now().minusDays(2), Duration.ofMinutes(450));
+        Subtask subtask2 = new Subtask("Test addNewSubTask2", "Test addNewSubTask2 description",
+                Status.NEW, epic.getId(), LocalDateTime.now().minusDays(3), Duration.ofMinutes(450));
+        taskManager.addSubTask(subtask1);
+        taskManager.addSubTask(subtask2);
+        assertEquals(Status.NEW, epic.getStatus(), "Статус эпика расчитывается неправильно");
+
+        Subtask updatedSubtask2 = new Subtask(subtask2);
+        updatedSubtask2.setStatus(Status.DONE);
+        taskManager.updateSubTask(updatedSubtask2);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика расчитывается неправильно");
+
+        Subtask updatedSubtask = new Subtask(subtask); // Я понимаю что код можно не усложнять созданием обьектов копий
+        Subtask updatedSubtask1 = new Subtask(subtask1); // Но обновлять таску передавая её же в метод обновления я посчитал неправильным
+        updatedSubtask.setStatus(Status.DONE); // Наверное я не прав
+        updatedSubtask1.setStatus(Status.DONE);
+        taskManager.updateSubTask(updatedSubtask);
+        taskManager.updateSubTask(updatedSubtask1);
+        assertEquals(Status.DONE, epic.getStatus(), "Статус эпика расчитывается неправильно");
+
+        subtask.setStatus(Status.IN_PROGRESS);
+        subtask1.setStatus(Status.IN_PROGRESS);
+        subtask2.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubTask(subtask);
+        taskManager.updateSubTask(subtask1);
+        taskManager.updateSubTask(subtask2);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика расчитывается неправильно");
+    }
+
+    @Test
+    void theTimeIntersectionShouldBeCalculatedCorrectly() {
+        Task updateTask = new Task(task);
+        taskManager.addTask(updateTask);
+
+        assertEquals(1, taskManager.getListAllTasks().size(), "Удалось добавить 2 задачи с одинаковым временным интервалом");
+
+        updateTask.setStartTime(updateTask.getStartTime().plusMinutes(200));
+        taskManager.addTask(updateTask);
+        assertEquals(1, taskManager.getListAllTasks().size(), "Удалось добавить задачу с пересекающимся временным интервалом");
+
+        updateTask.setStartTime(updateTask.getStartTime().plusMinutes(250));
+        taskManager.addTask(updateTask);
+        assertEquals(2, taskManager.getListAllTasks().size(), "Не удалось добавить задачу интервал времени которой не пересекается с другими задачами");
+    }
+
+
 }
