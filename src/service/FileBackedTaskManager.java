@@ -151,8 +151,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static void loadSetPriority(FileBackedTaskManager taskManager) {
         List<Task> tasks = taskManager.getListAllTasks();
         tasks.addAll(taskManager.getListAllSubTasks());
-        taskManager.setByPriority.addAll(tasks.stream().filter(task -> !task.getEndTime().
-                equals(Task.DEFAULT_TIME)).toList());
+        taskManager.setByPriority.addAll(tasks.stream().filter(task -> !task.getEndTime()
+                .equals(Task.DEFAULT_TIME)).toList());
 
     }
 }
