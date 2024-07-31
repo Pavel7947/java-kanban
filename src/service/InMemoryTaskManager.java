@@ -223,8 +223,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updateTimeEpic(Epic epic) {
-        List<Subtask> subtaskList = epic.getSubTaskIdList().stream().map(subTasks::get).
-                filter(subtask -> !subtask.getEndTime().equals(Task.DEFAULT_TIME)).toList();
+        List<Subtask> subtaskList = epic.getSubTaskIdList().stream().map(subTasks::get)
+                .filter(subtask -> !subtask.getEndTime().equals(Task.DEFAULT_TIME)).toList();
         if (subtaskList.isEmpty()) {
             epic.setStartTime(Task.DEFAULT_TIME);
             epic.setEndTime(Task.DEFAULT_TIME);
@@ -247,9 +247,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private Boolean isIntersection(Task task) {
-        return getPrioritizedTasks().stream().anyMatch(task1 -> !(task.getStartTime().isAfter(task1.getEndTime()) ||
-                task.getEndTime().isBefore(task1.getStartTime()) || task.getStartTime().equals(task1.getEndTime()) ||
-                task.getEndTime().equals(task1.getStartTime())));
+        return getPrioritizedTasks().stream().anyMatch(task1 -> !(task.getStartTime().isAfter(task1.getEndTime())
+                || task.getEndTime().isBefore(task1.getStartTime()) || task.getStartTime().equals(task1.getEndTime())
+                || task.getEndTime().equals(task1.getStartTime())));
     }
 
     @Override
