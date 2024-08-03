@@ -194,6 +194,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void theTimeIntersectionShouldBeCalculatedCorrectly() {
         Task updateTask = new Task(task);
+        updateTask.setId(0);
         taskManager.addTask(updateTask);
 
         assertEquals(1, taskManager.getListAllTasks().size(), "Удалось добавить 2 задачи с одинаковым временным интервалом");

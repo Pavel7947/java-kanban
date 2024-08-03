@@ -25,7 +25,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void remove(int id) {
         Node<Task> node = browsingHistory.remove(id);
-        removeNode(node);
+        if (node != null) {
+            removeNode(node);
+        }
     }
 
     @Override

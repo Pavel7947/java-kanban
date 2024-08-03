@@ -139,21 +139,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     taskManager.tasks.put(id, task);
                 }
             }
-            taskManager.setCurrentId(maxId + 1);
-            loadSetPriority(taskManager);
+            taskManager.currentId = (maxId + 1);
+            taskManager.setByPriority.addAll(taskManager.getListAllTasks());
+            taskManager.setByPriority.addAll(taskManager.getListAllSubTasks());
             return taskManager;
 
         } catch (IOException e) {
             throw new ManagerSaveException("Error when reading from a file", e);
         }
-    }
-
-    private static void loadSetPriority(FileBackedTaskManager taskManager) {
-        List<Task> tasks = taskManager.getListAllTasks();
-        tasks.addAll(taskManager.getListAllSubTasks());
-        taskManager.setByPriority.addAll(tasks.stream().filter(task -> !task.getEndTime()
-                .equals(Task.DEFAULT_TIME)).toList());
-
     }
 }
 
