@@ -18,4 +18,5 @@ public class Manager {
     public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
+
 }

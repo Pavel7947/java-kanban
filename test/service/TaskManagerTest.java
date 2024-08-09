@@ -95,9 +95,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask subtask2 = new Subtask(epic.getName(), epic.getDescription(), epic.getStatus(), epic.getId());
         subtask2.setId(epic.getId());
         taskManager.addSubTask(subtask2);
-        Subtask saveSubTask = taskManager.getSubTaskById(epic.getId());
 
-        assertNull(saveSubTask, "Ошибка. Эпик удалось добавить в самого себя в качестве подзадачи");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubTaskById(epic.getId())
+                , "Эпик удалось добавить в самого себя в качестве подзадачи");
     }
 
     @Test
@@ -105,10 +105,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask savedSubTask = taskManager.getSubTaskById(subtask.getId());
         Subtask updateSubTask = new Subtask(savedSubTask.getName(), savedSubTask.getDescription(),
                 savedSubTask.getStatus(), savedSubTask.getId());
-        taskManager.addSubTask(updateSubTask);
-        savedSubTask = taskManager.getSubTaskById(updateSubTask.getId());
-
-        assertNull(savedSubTask, "В качестве эпика удалось указать субтаску");
+        assertThrows(NotFoundException.class, () -> taskManager.addSubTask(updateSubTask)
+                , "В качестве эпика удалось указать субтаску");
     }
 
     @Test
@@ -152,11 +150,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void theEpicMustBeCorrectlyDeletedByID() {
         taskManager.removeEpicById(epic.getId());
-        Epic deletedEpic = taskManager.getEpicById(epic.getId());
-        Subtask deletedSubtask = taskManager.getSubTaskById(subtask.getId());
 
-        assertNull(deletedEpic, "Эпик не удалился по ID");
-        assertNull(deletedSubtask, "Субтаска после удаления эпика по ID не удалилась");
+        assertThrows(NotFoundException.class, () -> taskManager.getEpicById(epic.getId())
+                , "Эпик не удалился по ID");
+        assertThrows(NotFoundException.class, () -> taskManager.getSubTaskById(subtask.getId())
+                , "Субтаска после удаления эпика по ID не удалилась");
     }
 
     @Test
@@ -174,9 +172,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.updateSubTask(updatedSubtask2);
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика расчитывается неправильно");
 
-        Subtask updatedSubtask = new Subtask(subtask); // Я понимаю что код можно не усложнять созданием обьектов копий
-        Subtask updatedSubtask1 = new Subtask(subtask1); // Но обновлять таску передавая её же в метод обновления я посчитал неправильным
-        updatedSubtask.setStatus(Status.DONE); // Наверное я не прав
+        Subtask updatedSubtask = new Subtask(subtask);
+        Subtask updatedSubtask1 = new Subtask(subtask1);
+        updatedSubtask.setStatus(Status.DONE);
         updatedSubtask1.setStatus(Status.DONE);
         taskManager.updateSubTask(updatedSubtask);
         taskManager.updateSubTask(updatedSubtask1);
@@ -195,13 +193,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void theTimeIntersectionShouldBeCalculatedCorrectly() {
         Task updateTask = new Task(task);
         updateTask.setId(0);
-        taskManager.addTask(updateTask);
 
-        assertEquals(1, taskManager.getListAllTasks().size(), "Удалось добавить 2 задачи с одинаковым временным интервалом");
+        assertThrows(IntersectException.class, () -> taskManager.addTask(updateTask), "Удалось добавить 2 задачи с одинаковым временным интервалом");
 
         updateTask.setStartTime(updateTask.getStartTime().plusMinutes(200));
-        taskManager.addTask(updateTask);
-        assertEquals(1, taskManager.getListAllTasks().size(), "Удалось добавить задачу с пересекающимся временным интервалом");
+        assertThrows(IntersectException.class, () -> taskManager.addTask(updateTask), "Удалось добавить задачу с пересекающимся временным интервалом");
 
         updateTask.setStartTime(updateTask.getStartTime().plusMinutes(250));
         taskManager.addTask(updateTask);
