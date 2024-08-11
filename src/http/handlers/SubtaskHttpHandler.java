@@ -82,17 +82,17 @@ public class SubtaskHttpHandler extends BaseHttpHandler {
         }
     }
 
-        private Subtask getSubtaskFromJson (HttpExchange h){
-            String body = "";
-            try (InputStream inputStream = h.getRequestBody()) {
-                body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                if (body.isBlank()) {
-                    throw new NotAllowedRequestException("Тело запроса оказалось пустым " + body);
-                }
-                return gson.fromJson(body, Subtask.class);
-            } catch (Exception e) {
-                throw new NotAllowedRequestException("Ошибка при преобразовании тела запроса: " + body);
+    private Subtask getSubtaskFromJson(HttpExchange h) {
+        String body = "";
+        try (InputStream inputStream = h.getRequestBody()) {
+            body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            if (body.isBlank()) {
+                throw new NotAllowedRequestException("Тело запроса оказалось пустым " + body);
             }
+            return gson.fromJson(body, Subtask.class);
+        } catch (Exception e) {
+            throw new NotAllowedRequestException("Ошибка при преобразовании тела запроса: " + body);
         }
     }
+}
 
