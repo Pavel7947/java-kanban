@@ -1,11 +1,11 @@
 package http.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import http.exceptions.IdFormatException;
-import http.exceptions.NotAllowedRequestException;
+import exceptions.IdFormatException;
+import exceptions.NotAllowedRequestException;
 import model.Task;
-import service.IntersectException;
-import service.NotFoundException;
+import exceptions.IntersectException;
+import exceptions.NotFoundException;
 import service.TaskManager;
 
 import java.io.IOException;
@@ -22,67 +22,67 @@ public class TaskHttpHandler extends BaseHttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        try {
-            String path = exchange.getRequestURI().getPath();
-            String method = exchange.getRequestMethod();
+        try (exchange) {
+            try {
+                String path = exchange.getRequestURI().getPath();
+                String method = exchange.getRequestMethod();
 
-            switch (method) {
-                case "GET":
-                    if (Pattern.matches("^/tasks/\\d+$", path)) {
-                        String idPath = path.replace("/tasks/", "");
-                        int id = parsePathId(idPath);
-                        Task task = taskManager.getTaskById(id);
-                        String responseTask = gson.toJson(task);
-                        sendText(exchange, responseTask);
-                    } else {
-                        List<Task> taskList = taskManager.getListAllTasks();
-                        String response = gson.toJson(taskList);
-                        sendText(exchange, response);
-                    }
-                    break;
-                case "DELETE":
-                    if (Pattern.matches("^/tasks/\\d+$", path)) {
-                        String idPath = path.replace("/tasks/", "");
-                        int id = parsePathId(idPath);
-                        taskManager.removeTaskById(id);
-                        exchange.sendResponseHeaders(200, 0);
-                    } else {
-                        throw new NotAllowedRequestException("Недопустимый путь запроса для метода DELETE: " + path);
-                    }
-                    break;
-                case "POST":
-                    Task task = getTaskFromJson(exchange);
-                    int id = task.getId();
-                    if (id != 0) {
-                        taskManager.updateTask(task);
-                        exchange.sendResponseHeaders(201, 0);
-                    } else {
-                        taskManager.addTask(task);
-                        exchange.sendResponseHeaders(201, 0);
-                    }
-                    break;
-                default:
-                    throw new NotAllowedRequestException("Метод: " + method + " не разрешен");
+                switch (method) {
+                    case "GET":
+                        if (Pattern.matches("^/tasks/\\d+$", path)) {
+                            String idPath = path.replace("/tasks/", "");
+                            int id = parsePathId(idPath);
+                            Task task = taskManager.getTaskById(id);
+                            String responseTask = gson.toJson(task);
+                            sendText(exchange, responseTask);
+                        } else {
+                            List<Task> taskList = taskManager.getListAllTasks();
+                            String response = gson.toJson(taskList);
+                            sendText(exchange, response);
+                        }
+                        break;
+                    case "DELETE":
+                        if (Pattern.matches("^/tasks/\\d+$", path)) {
+                            String idPath = path.replace("/tasks/", "");
+                            int id = parsePathId(idPath);
+                            taskManager.removeTaskById(id);
+                            exchange.sendResponseHeaders(200, 0);
+                        } else {
+                            throw new NotAllowedRequestException("Недопустимый путь запроса для метода DELETE: " + path);
+                        }
+                        break;
+                    case "POST":
+                        Task task = getTaskFromJson(exchange);
+                        int id = task.getId();
+                        if (id != 0) {
+                            taskManager.updateTask(task);
+                            exchange.sendResponseHeaders(201, 0);
+                        } else {
+                            taskManager.addTask(task);
+                            exchange.sendResponseHeaders(201, 0);
+                        }
+                        break;
+                    default:
+                        throw new NotAllowedRequestException("Метод: " + method + " не разрешен");
+                }
+            } catch (NotAllowedRequestException | IdFormatException e) {
+                System.out.println(e.getMessage());
+                sendNotAllowed(exchange);
+            } catch (NotFoundException e) {
+                System.out.println(e.getMessage());
+                sendNotFound(exchange);
+            } catch (IntersectException e) {
+                System.out.println(e.getMessage());
+                sendHasInteractions(exchange);
+            } catch (Exception e) {
+                e.printStackTrace();
+                sendServerError(exchange);
             }
-        } catch (NotAllowedRequestException | IdFormatException e) {
-            System.out.println(e.getMessage());
-            sendNotAllowed(exchange);
-        } catch (NotFoundException e) {
-            System.out.println(e.getMessage());
-            sendNotFound(exchange);
-        } catch (IntersectException e) {
-            System.out.println(e.getMessage());
-            sendHasInteractions(exchange);
-        } catch (Exception e) {
-            e.printStackTrace();
-            sendServerError(exchange);
-        } finally {
-            exchange.close();
         }
     }
 
     private Task getTaskFromJson(HttpExchange h) {
-        String body = null;
+        String body = "";
         try (InputStream inputStream = h.getRequestBody()) {
             body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             if (body.isBlank()) {
@@ -91,8 +91,6 @@ public class TaskHttpHandler extends BaseHttpHandler {
             return gson.fromJson(body, Task.class);
         } catch (Exception e) {
             throw new NotAllowedRequestException("Ошибка при преобразовании тела запроса: " + body);
-
-
         }
     }
 }

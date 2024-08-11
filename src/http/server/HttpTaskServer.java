@@ -1,18 +1,12 @@
 package http.server;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
-import http.adapters.DateTimeAdapter;
-import http.adapters.DurationAdapter;
 import http.handlers.*;
 import service.Manager;
 import service.TaskManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -30,11 +24,10 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) throws IOException {
-        TaskManager taskManager1 = Manager.getDefault();
-        HttpTaskServer taskServer = new HttpTaskServer(taskManager1);
+        TaskManager taskManager = Manager.getDefault();
+        HttpTaskServer taskServer = new HttpTaskServer(taskManager);
         taskServer.start();
         System.out.println("Сервер запущен на порту 8080");
-
     }
 
     public void start() {
@@ -45,8 +38,4 @@ public class HttpTaskServer {
         server.stop(0);
     }
 
-    public static Gson getGson() {
-        return new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new DateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter()).create();
-    }
 }

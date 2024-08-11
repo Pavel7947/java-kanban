@@ -1,7 +1,7 @@
 package http.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import http.exceptions.NotAllowedRequestException;
+import exceptions.NotAllowedRequestException;
 import model.Task;
 import service.TaskManager;
 
@@ -16,23 +16,23 @@ public class PrioritizedHttpHandler extends BaseHttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        try {
-            String method = exchange.getRequestMethod();
-            if (method.equals("GET")) {
-                List<Task> tasks = taskManager.getPrioritizedTasks();
-                String response = gson.toJson(tasks);
-                sendText(exchange, response);
-                return;
+        try (exchange) {
+            try {
+                String method = exchange.getRequestMethod();
+                if (method.equals("GET")) {
+                    List<Task> tasks = taskManager.getPrioritizedTasks();
+                    String response = gson.toJson(tasks);
+                    sendText(exchange, response);
+                    return;
+                }
+                throw new NotAllowedRequestException("Метод: " + method + " не разрешен");
+            } catch (NotAllowedRequestException e) {
+                sendNotAllowed(exchange);
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                sendServerError(exchange);
             }
-            throw new NotAllowedRequestException("Метод: " + method + " не разрешен");
-        } catch (NotAllowedRequestException e) {
-            sendNotAllowed(exchange);
-            System.out.println(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            sendServerError(exchange);
-        } finally {
-            exchange.close();
         }
     }
 }

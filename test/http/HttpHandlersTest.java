@@ -30,7 +30,7 @@ public class HttpHandlersTest {
         taskManager = Manager.getDefault();
         fillingTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = HttpTaskServer.getGson();
+        gson = Manager.getGson();
         taskServer.start();
     }
 
