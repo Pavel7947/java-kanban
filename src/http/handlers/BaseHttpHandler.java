@@ -20,29 +20,43 @@ public abstract class BaseHttpHandler implements HttpHandler {
         this.taskManager = taskManager;
     }
 
-    protected void sendText(HttpExchange httpExchange, String text) throws IOException {
+    protected void sendText(HttpExchange httpExchange, String text) {
         try (httpExchange) {
             byte[] resp = text.getBytes(StandardCharsets.UTF_8);
             httpExchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
             httpExchange.sendResponseHeaders(200, resp.length);
             httpExchange.getResponseBody().write(resp);
             System.out.println("Тело ответа успешно отправлено");
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при отправке текта " + text, e);
         }
     }
 
-    protected void sendNotFound(HttpExchange httpExchange) throws IOException {
-        httpExchange.sendResponseHeaders(404, 0);
-        System.out.println("Клиенту вернулся 404 код статуса");
+    protected void sendNotFound(HttpExchange httpExchange) {
+        try {
+            httpExchange.sendResponseHeaders(404, 0);
+            System.out.println("Клиенту вернулся 404 код статуса");
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при возврате 404 кода статуса", e);
+        }
     }
 
-    protected void sendHasInteractions(HttpExchange httpExchange) throws IOException {
-        httpExchange.sendResponseHeaders(406, 0);
-        System.out.println("Клиенту вернулся 406 код статуса");
+    protected void sendHasInteractions(HttpExchange httpExchange) {
+        try {
+            httpExchange.sendResponseHeaders(406, 0);
+            System.out.println("Клиенту вернулся 406 код статуса");
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при возврате 406 кода статуса", e);
+        }
     }
 
-    protected void sendNotAllowed(HttpExchange httpExchange) throws IOException {
-        httpExchange.sendResponseHeaders(405, 0);
-        System.out.println("Клиенту вернулся 405 код статуса");
+    protected void sendNotAllowed(HttpExchange httpExchange) {
+        try {
+            httpExchange.sendResponseHeaders(405, 0);
+            System.out.println("Клиенту вернулся 405 код статуса");
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при возврате 405 кода статуса", e);
+        }
     }
 
     protected void sendServerError(HttpExchange httpExchange) {
