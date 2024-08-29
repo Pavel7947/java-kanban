@@ -60,17 +60,11 @@ public class Task {
     }
 
     public Duration getDuration() {
-        if (duration != null) {
-            return duration;
-        }
-        return null;
+        return duration;
     }
 
     public LocalDateTime getStartTime() {
-        if (startTime != null) {
-            return startTime;
-        }
-        return null;
+        return startTime;
     }
 
     public String getDescription() {
